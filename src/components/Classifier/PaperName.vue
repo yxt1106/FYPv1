@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { Select, Button, CheckboxGroup, SelectOption, Modal, Image } from 'ant-design-vue';
+import { Select, Button, CheckboxGroup, SelectOption, Modal, Image, InputGroup, Tooltip, message } from 'ant-design-vue';
+import { SearchOutlined } from '@ant-design/icons-vue';
 import { PageHeader } from 'ant-design-vue';
 import { useDataStore } from '../../apis/dataStore.js';
 
 const dataStore = useDataStore();
 let displayData = ref([])
+const selectedPaperName = ref('All')
 const selectedFigureType = ref('All')
 const selectedStatus = ref('All');
 const All = ref('All');
@@ -13,7 +15,17 @@ const All = ref('All');
 const paperNameData = computed(() =>
   dataStore.fetchedData.map(item => ({ value: item.Name }))
 )
-const handleChangePaperNameData = value => console.log(value);
+const paperNameSelected = value => {
+  selectedPaperName.value = value
+  console.log(selectedPaperName.value);
+}
+const handleSearchButton = value => {
+  displayData.value = dataStore.fetchedData.filter(item => {
+      const nameMatched = item.Name.toLowerCase().includes(selectedPaperName.value.toLowerCase()) ||
+      selectedPaperName.value == 'All'
+      return nameMatched
+    })
+}
 
 //CheckBox
 const options = ['Yes', 'No']
@@ -90,7 +102,11 @@ const handleClickedButton = () => {
 
     return figureTypeMatch && statusMatch && state.value.checkedList.includes(item.ViewAngleChange);;
   });
-  console.log('button');
+  if(displayData.value.length != 0){
+    message.success('Data filtered successfully!')
+  }else{
+    message.error('No data found!')
+  }
 }
 
 onMounted(async () => {
@@ -102,14 +118,32 @@ onMounted(async () => {
 
 <template>
   <div class="header">
-    <PageHeader style="border: 1px solid rgb(235, 237, 240)" title="Visualization in motion" sub-title="" :ghost=false />
+    <PageHeader style="border: 1px solid rgba(235, 237, 240, 0);background-color: rgb(210, 207, 207);"
+      title="Visualization in Motion" sub-title="" :ghost=false />
   </div>
-  <div class="container">
+  <div style="background-color: rgb(234, 234, 234); margin: 0px; padding: 0px; width: 100%; position: absolute; left: 0px; right: 0px;">
+    <div class="container">
     <div class="content">
       <div class="read-the-docs">
-        Paper Name: <Select style="width: 200px" v-model:value="All" :options="paperNameData"
+        <!-- <div style="display: flex; align-items: center;">
+          <Select type='search' show-search :show-arrow="false" style="width: 50%; flex: 1"
+            :options="paperNameData"></Select>
+          <Button size="middle" style="white-space: nowrap"></Button>
+        </div> -->
+        <InputGroup compact>
+          <Select type='search' show-search :show-arrow="false" style="width: 50%; flex: 1"
+            :options="paperNameData" @change="paperNameSelected" v-model:value="All"></Select>
+          <Tooltip title="Search by paper name">
+            <Button size="middle" type="primary" style='background-color: orange;' @click="handleSearchButton">
+            <template #icon>
+              <SearchOutlined />
+            </template>
+          </Button>
+          </Tooltip>
+        </InputGroup>
+        <!-- Paper Name: <Select style="width: 200px" v-model:value="All" :options="paperNameData"
           @change="handleChangePaperNameData">
-        </Select>
+        </Select> -->
       </div>
       <div class="viewing-angle-change">
         Viewing angle change:
@@ -122,7 +156,7 @@ onMounted(async () => {
       <div class="Movementstatus">
         Movement status: <Select style="width: 200px; margin-right: 100px;" v-model:value="All2" :options="status"
           @change="handleStatus"></Select>
-        <Button type="primary" size="large" @click="handleClickedButton">Confirm!</Button>
+        <Button type="primary" size="large" style="background-color:#ffa500" @click="handleClickedButton">Confirm!</Button>
       </div>
     </div>
   </div>
@@ -147,6 +181,8 @@ onMounted(async () => {
       </li>
     </ul>
   </div>
+  </div>
+  
 </template>
 
 <style scoped>
@@ -159,7 +195,7 @@ onMounted(async () => {
   width: 100%;
   margin: 0 !important;
   padding: 0 !important;
-  z-index: 1030
+  z-index: 1
 }
 
 .container {
