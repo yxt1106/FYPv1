@@ -7,6 +7,8 @@ import commonjs from 'vite-plugin-commonjs';
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 // https://vite.dev/config/
 export default defineConfig({
+  assetsDir: "assets",
+  base: './',
   define: {
     'process.env': {},
     "process.browser": true
@@ -14,18 +16,18 @@ export default defineConfig({
   plugins: [vue(),
     // commonjs(),
     // nodePolyfills(),
-  //   requireTransform({
-  //   fileRegex: /.js$|.vue$/,
-  // })
-],
-resolve: {
-  alias: {
-    stream: 'stream-browserify', 
-    path: 'path-browserify',
+    //   requireTransform({
+    //   fileRegex: /.js$|.vue$/,
+    // })
+  ],
+  resolve: {
+    alias: {
+      stream: 'stream-browserify',
+      path: 'path-browserify',
+    },
   },
-},
-ssr: {
-  noExternal: ['some-package-causing-issue'], // 这里替换成报错的依赖
-},
+  ssr: {
+    noExternal: ['some-package-causing-issue'], // 这里替换成报错的依赖
+  },
 })
 
