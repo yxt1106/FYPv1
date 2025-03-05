@@ -1,5 +1,5 @@
-// import { createApp } from 'vue/dist/vue.esm-bundler';
-import { createApp } from 'vue/dist/vue.runtime.esm-bundler';
+import { createApp } from 'vue/dist/vue.esm-bundler';
+// import { createApp } from 'vue/dist/vue.runtime.esm-bundler';
 import { createPinia } from 'pinia'
 import './style.css'
 import App from './App.vue'
